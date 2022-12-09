@@ -1,0 +1,261 @@
+package Paket1;
+
+import java.awt.Color;
+import java.awt.Graphics;
+import java.awt.Rectangle;
+import java.awt.event.ActionEvent;
+import java.awt.event.ActionListener;
+import java.awt.event.KeyEvent;
+import java.awt.event.KeyListener;
+import java.awt.image.BufferedImage;
+import java.io.File;
+import java.io.FileNotFoundException;
+import java.io.IOException;
+import java.util.ArrayList;
+
+import javax.imageio.ImageIO;
+import javax.imageio.stream.FileImageInputStream;
+import javax.swing.JOptionPane;
+import javax.swing.JPanel;
+import javax.swing.Timer;
+
+class ates {
+	
+	private int x ;
+	private int y ;
+	
+	public int getX() {
+		return x;
+	}
+	public void setX(int x) {
+		this.x = x;
+	}
+	public int getY() {
+		return y;
+	}
+	public void setY(int y) {
+		this.y = y;
+	}
+	
+	public ates(int x, int y) {
+		
+		super();
+		
+		this.x = x;
+		this.y = y;
+		
+	}
+	
+	
+	
+}
+
+public class Oyun extends JPanel implements KeyListener,ActionListener{
+	
+	Timer timer = new Timer(5,this);
+	
+	private int gecen_sure = 0;
+	
+	private int harcanan_ates = 0 ;
+	
+	private int topx = 0;
+	
+	private int topxdir = 5;
+	
+	private int UzayGemisiX = 0 ;
+	
+	private int UzayGemisiY = 490;
+	
+	private int DirUzayGemisix = 20 ;
+	
+	private BufferedImage image ;
+	
+	private int atesdiry = 4 ;
+	
+	ArrayList<ates> atesler = new ArrayList<ates>();
+	
+	public boolean Check() {
+		
+		for(ates ates1 : atesler) {
+			
+			if(new Rectangle(ates1.getX(),ates1.getY(),9,12).intersects(new Rectangle(topx,0,15,15))) {
+				
+				return true;
+				
+			}
+		}
+		
+		return false;
+		
+	}
+	
+	
+	public Oyun() {
+		
+		try {
+			
+			image = ImageIO.read(new FileImageInputStream(new File("collection-black-spaceship-cliparts-11.png")));
+		} 
+		
+		catch (FileNotFoundException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		} catch (IOException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+		
+		setBackground(Color.BLACK);
+		
+		
+		timer.start();
+		
+	}
+	
+
+	@Override
+	public void paint(Graphics g) {
+	
+		super.paint(g);
+		gecen_sure += 5;
+		
+		
+		g.setColor(Color.RED);
+		
+		g.fillOval(topx,0,15,15);
+		
+		g.drawImage(image,UzayGemisiX,UzayGemisiY,image.getWidth() / 50,image.getHeight() / 50 ,this);
+		
+		
+		
+		for(ates ates1 : atesler) {
+			
+			if(ates1.getY()<0) {
+				
+				atesler.remove(ates1);
+				
+			}
+		}
+		
+		g.setColor(Color.BLUE);
+		
+		for(ates ates1 : atesler) {
+			
+			g.fillRect(ates1.getX(),ates1.getY(),9,12);
+			
+		}
+		
+		
+		if(Check()) {
+			
+			timer.stop();
+			
+			String message = "Oyun Sonlandı.\n" + "Harcanan ateş : " + harcanan_ates +
+					
+			"\nGecen Süre : " + gecen_sure/1000.0 + " saniye";
+			
+			JOptionPane.showMessageDialog(this,message);
+			
+			System.exit(0);
+			
+		}
+		
+		
+		
+	}
+	
+
+	@Override
+	public void repaint() {
+
+		super.repaint();
+	}
+
+
+	@Override
+	public void actionPerformed(ActionEvent e) {
+		
+		
+		for(ates ates1 :atesler) {
+			
+			ates1.setY(ates1.getY() - atesdiry);
+			
+		}
+		
+		topx += topxdir ;
+		
+		if(topx>=767) {
+			
+			topxdir = -topxdir;
+		}
+		
+		else if(topx<=0) {
+			
+			topxdir = -topxdir;
+			
+		}
+		
+		repaint();
+		
+	}
+	
+
+	@Override
+	public void keyTyped(KeyEvent e) {
+		
+		
+	}
+
+	@Override
+	public void keyPressed(KeyEvent e) {
+		
+		int d = e.getKeyCode();
+		
+		if(d == KeyEvent.VK_LEFT) {
+			
+			if(UzayGemisiX<=0) {
+				
+				UzayGemisiX = 0;
+				
+			}
+			else {
+				
+				UzayGemisiX -= DirUzayGemisix;
+				
+			}
+			
+		}
+		else if(d == KeyEvent.VK_RIGHT) {
+			
+			if(UzayGemisiX>=740) {
+				
+				UzayGemisiX = 740;
+				
+			}
+			else {
+				
+				UzayGemisiX += DirUzayGemisix;
+				
+			}
+			
+		}
+		else if(d == KeyEvent.VK_CONTROL) {
+			
+			atesler.add(new ates(UzayGemisiX+15,UzayGemisiY));
+			
+			harcanan_ates++;
+			
+		}
+		
+		
+		
+	}
+
+	@Override
+	public void keyReleased(KeyEvent e) {
+		
+		
+	}
+	
+
+}
